@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-weight: 500;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+  }
+
+  /* Auth pages: split layout (login / register) */
+  .auth-split {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .auth-split-hero {
+    display: none;
+    width: 45%;
+    flex-shrink: 0;
+  }
+
+  .auth-split-form {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #f7f9fb;
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .auth-split-hero {
+      display: block;
+    }
+
+    .auth-split-form {
+      width: 55%;
+      flex: 0 0 55%;
+      padding: 3rem;
+    }
+  }
+
+  .auth-hero-gradient {
+    background: linear-gradient(to bottom right, #2563eb, #1d4ed8);
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .billing-active-mode {
+    background-color: #0f172a;
+    color: #fff;
+  }
+}

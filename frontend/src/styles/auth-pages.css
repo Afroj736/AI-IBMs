@@ -1,0 +1,197 @@
+/* Auth pages — plain CSS (works even if Tailwind fails to load in dev) */
+
+.auth-page {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-inter, Inter, system-ui, -apple-system, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+.auth-hero-panel {
+  display: none;
+  width: 45%;
+  flex-shrink: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-form-panel {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f7f9fb;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .auth-hero-panel {
+    display: block;
+  }
+
+  .auth-form-panel {
+    width: 55%;
+    flex: 0 0 55%;
+    padding: 48px;
+  }
+}
+
+.auth-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  padding: 40px 48px;
+  box-sizing: border-box;
+}
+
+.auth-hero-blur-top {
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 384px;
+  height: 384px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  filter: blur(64px);
+  pointer-events: none;
+}
+
+.auth-hero-blur-bottom {
+  position: absolute;
+  bottom: -5%;
+  left: -5%;
+  width: 256px;
+  height: 256px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.auth-hero-title {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  color: #fff;
+}
+
+.auth-hero-tagline {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 4px 0 0;
+}
+
+.auth-hero-headline {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0 0 24px;
+}
+
+.auth-hero-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 32px;
+  max-width: 32rem;
+}
+
+.auth-hero-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.auth-hero-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.auth-hero-check {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #86efac;
+}
+
+.auth-hero-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.auth-hero-trusted-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 24px;
+}
+
+.auth-hero-logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px;
+  opacity: 0.7;
+  filter: grayscale(1) brightness(2);
+}
+
+.auth-hero-logos img {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 650px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(198, 198, 205, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 20px 40px rgba(37, 99, 235, 0.06);
+  padding: 32px 40px;
+  box-sizing: border-box;
+}
+
+.auth-card-login {
+  max-width: 540px;
+  border-radius: 24px;
+  padding: 40px 56px;
+  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 768px) {
+  .auth-card {
+    padding: 40px 48px;
+  }
+}

@@ -1,0 +1,925 @@
+{
+  "info": {
+    "name": "Inventory AI System API",
+    "description": "Full API collection for Inventory AI / SmartBill backend.\n\n**Base:** `{{baseUrl}}` = http://localhost:8000/api/v1\n**Swagger:** http://localhost:8000/docs\n\n### Quick start\n1. Ensure backend is running on port 8000.\n2. Run **Auth → Login** (seed: admin@blulabs.in / Admin@12345).\n3. Token is saved to `{{token}}` automatically.\n4. Create resources; IDs are saved to collection variables.\n\nSee also: docs/API_COLLECTION.md",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "inventory-ai-system-full-v2"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000/api/v1" },
+    { "key": "host", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "itemId", "value": "" },
+    { "key": "itemCode", "value": "ITM-SAMSUNG-S25U" },
+    { "key": "brandId", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "partyId", "value": "" },
+    { "key": "templateId", "value": "" },
+    { "key": "invoiceId", "value": "" },
+    { "key": "recordingId", "value": "" },
+    { "key": "draftId", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "gstin", "value": "29ABCDE1234F1Z5" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{host}}/health",
+            "description": "No auth. Returns app/DB health."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.collectionVariables.set('token', j.access_token);",
+                  "  if (j.refresh_token) pm.collectionVariables.set('refreshToken', j.refresh_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner.demo@blulabs.in\",\n  \"password\": \"Owner@12345\",\n  \"business_name\": \"Demo Store\",\n  \"owner_name\": \"Demo Owner\",\n  \"mobile\": \"9876543210\",\n  \"gst_number\": \"29ABCDE1234F1Z5\",\n  \"address\": \"Bengaluru, Karnataka\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register",
+            "description": "Creates owner + company. Do not assign admin via public register."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.collectionVariables.set('token', j.access_token);",
+                  "  if (j.refresh_token) pm.collectionVariables.set('refreshToken', j.refresh_token);",
+                  "  console.log('Token saved');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@blulabs.in\",\n  \"password\": \"Admin@12345\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Local seed admin. Saves access + refresh tokens."
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  pm.collectionVariables.set('token', j.access_token);",
+                  "  if (j.refresh_token) pm.collectionVariables.set('refreshToken', j.refresh_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/refresh"
+          }
+        },
+        {
+          "name": "Me (current user)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "item": [
+        {
+          "name": "Create Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "  const j = pm.response.json();",
+                  "  pm.collectionVariables.set('itemId', j.id);",
+                  "  pm.collectionVariables.set('itemCode', j.item_code);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"item_name\": \"Samsung Galaxy S25 Ultra\",\n  \"item_code\": \"ITM-SAMSUNG-S25U\",\n  \"sku\": \"SKU-SAMSUNG-S25U\",\n  \"barcode\": \"8901000000001\",\n  \"category\": \"Mobile Phones\",\n  \"sub_category\": \"Flagship\",\n  \"brand\": \"Samsung\",\n  \"model_number\": \"S25 Ultra\",\n  \"serial_number_required\": false,\n  \"hsn_code\": \"85171200\",\n  \"gst_percentage\": 18,\n  \"purchase_price\": 98000,\n  \"selling_price\": 105000,\n  \"minimum_stock\": 5,\n  \"current_stock\": 25,\n  \"description\": \"Flagship smartphone\",\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{baseUrl}}/inventory/items"
+          }
+        },
+        {
+          "name": "List Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const arr = pm.response.json();",
+                  "  if (Array.isArray(arr) && arr.length) {",
+                  "    pm.collectionVariables.set('itemId', arr[0].id);",
+                  "    pm.collectionVariables.set('itemCode', arr[0].item_code);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/inventory/items"
+          }
+        },
+        {
+          "name": "List Brands",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/inventory/brands"
+          }
+        },
+        {
+          "name": "Create Brand",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "  pm.collectionVariables.set('brandId', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Samsung\"\n}"
+            },
+            "url": "{{baseUrl}}/inventory/brands"
+          }
+        },
+        {
+          "name": "Delete Brand",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/inventory/brands/{{brandId}}"
+          }
+        },
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/inventory/categories"
+          }
+        },
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "  pm.collectionVariables.set('categoryId', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mobile Phones\"\n}"
+            },
+            "url": "{{baseUrl}}/inventory/categories"
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/inventory/categories/{{categoryId}}"
+          }
+        },
+        {
+          "name": "Catalog Bulk Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand_name\": \"Apple\",\n  \"category_name\": \"Audio\"\n}"
+            },
+            "url": "{{baseUrl}}/inventory/catalog/bulk"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parties",
+      "item": [
+        {
+          "name": "Create Party",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "  pm.collectionVariables.set('partyId', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"party_type\": \"customer\",\n  \"name\": \"Raj Electronics\",\n  \"business_name\": \"Raj Electronics\",\n  \"gstin\": \"06ABCDE1234F1Z5\",\n  \"mobile\": \"9876543210\",\n  \"email\": \"raj@electronics.example\",\n  \"billing_address\": \"Shop 21, Main Market\",\n  \"city\": \"Gurugram\",\n  \"state\": \"Haryana\",\n  \"country\": \"India\",\n  \"pincode\": \"122001\",\n  \"credit_limit\": 500000,\n  \"opening_balance\": 0,\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{baseUrl}}/parties"
+          }
+        },
+        {
+          "name": "List Parties",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const arr = pm.response.json();",
+                  "  if (Array.isArray(arr) && arr.length) pm.collectionVariables.set('partyId', arr[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/parties?search=&party_type=customer",
+              "host": ["{{baseUrl}}"],
+              "path": ["parties"],
+              "query": [
+                { "key": "search", "value": "" },
+                { "key": "party_type", "value": "customer", "description": "customer | supplier | both" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Party by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/parties/{{partyId}}"
+          }
+        },
+        {
+          "name": "Update Party",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Raj Electronics Updated\",\n  \"mobile\": \"9876543210\"\n}"
+            },
+            "url": "{{baseUrl}}/parties/{{partyId}}"
+          }
+        },
+        {
+          "name": "Party Ledger",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/parties/{{partyId}}/ledger"
+          }
+        },
+        {
+          "name": "Party Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/parties/{{partyId}}/transactions"
+          }
+        },
+        {
+          "name": "Delete Party",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/parties/{{partyId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoice Templates",
+      "item": [
+        {
+          "name": "Create Template",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "  pm.collectionVariables.set('templateId', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_name\": \"Retail GST Invoice Demo\",\n  \"template_type\": \"retail_gst_invoice\",\n  \"company_name\": \"Local Demo Store\",\n  \"company_address\": \"123 Demo Street, Bengaluru\",\n  \"gstin\": \"29ABCDE1234F1Z5\",\n  \"contact_number\": \"+919999999999\",\n  \"email\": \"billing@local.example\",\n  \"show_qr\": true,\n  \"show_barcode\": true,\n  \"show_signature\": true,\n  \"footer_text\": \"Thank you for your purchase.\",\n  \"terms_conditions\": \"Goods once sold will not be taken back.\",\n  \"template_json\": { \"layout\": \"default-retail-gst\" },\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{baseUrl}}/invoice-templates"
+          }
+        },
+        {
+          "name": "List Templates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const arr = pm.response.json();",
+                  "  if (Array.isArray(arr) && arr.length) pm.collectionVariables.set('templateId', arr[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/invoice-templates"
+          }
+        },
+        {
+          "name": "Get Template by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/invoice-templates/{{templateId}}"
+          }
+        },
+        {
+          "name": "Update Template",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"footer_text\": \"Updated footer text\"\n}"
+            },
+            "url": "{{baseUrl}}/invoice-templates/{{templateId}}"
+          }
+        },
+        {
+          "name": "Duplicate Template",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/invoice-templates/{{templateId}}/duplicate"
+          }
+        },
+        {
+          "name": "Activate Template",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/invoice-templates/{{templateId}}/activate"
+          }
+        },
+        {
+          "name": "Delete Template",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/invoice-templates/{{templateId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Next Invoice Number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/next-number?type=retail",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices", "next-number"],
+              "query": [
+                { "key": "type", "value": "retail", "description": "retail | gst" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "  pm.collectionVariables.set('invoiceId', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"party_id\": \"{{partyId}}\",\n  \"template_id\": \"{{templateId}}\",\n  \"invoice_type\": \"retail\",\n  \"invoice_date\": \"2026-10-20\",\n  \"discount_amount\": 0,\n  \"round_off\": 0,\n  \"received_amount\": 0,\n  \"notes\": \"Test invoice from Postman\",\n  \"items\": [\n    {\n      \"item_id\": \"{{itemId}}\",\n      \"quantity\": 2,\n      \"discount\": 0\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/invoices",
+            "description": "Requires partyId and itemId from List/Create requests."
+          }
+        },
+        {
+          "name": "List Invoices",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const arr = pm.response.json();",
+                  "  if (Array.isArray(arr) && arr.length) pm.collectionVariables.set('invoiceId', arr[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices?search=",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"],
+              "query": [{ "key": "search", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/invoices/{{invoiceId}}"
+          }
+        },
+        {
+          "name": "Update Invoice",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_status\": \"paid\",\n  \"received_amount\": 1000,\n  \"notes\": \"Payment received\"\n}"
+            },
+            "url": "{{baseUrl}}/invoices/{{invoiceId}}"
+          }
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/invoices/{{invoiceId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Billing",
+      "item": [
+        {
+          "name": "Get Business Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/billing/business"
+          }
+        },
+        {
+          "name": "AI Validate Bill Lines",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lines\": [\n    { \"item_code\": \"{{itemCode}}\", \"quantity\": 2 }\n  ],\n  \"create_missing_as_draft\": true\n}"
+            },
+            "url": "{{baseUrl}}/billing/ai-validate-lines",
+            "description": "AI guardrail: only active in-stock items accepted."
+          }
+        },
+        {
+          "name": "Manual Update Stock",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/billing/manual-update-stock/{{itemCode}}?delta=-1",
+              "host": ["{{baseUrl}}"],
+              "path": ["billing", "manual-update-stock", "{{itemCode}}"],
+              "query": [{ "key": "delta", "value": "-1", "description": "Positive to add, negative to reduce" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Voice & AI Drafts",
+      "item": [
+        {
+          "name": "Upload Voice Audio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('recordingId', pm.response.json().recording_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio_file",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select .wav, .mp3, .webm, or .m4a (max 25MB)."
+                },
+                {
+                  "key": "template_id",
+                  "value": "{{templateId}}",
+                  "type": "text",
+                  "description": "Optional"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/voice/upload"
+          }
+        },
+        {
+          "name": "Create Draft from Recording",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('draftId', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recording_id\": \"{{recordingId}}\",\n  \"template_id\": \"{{templateId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/voice/drafts"
+          }
+        },
+        {
+          "name": "Get Draft",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/voice/drafts/{{draftId}}"
+          }
+        },
+        {
+          "name": "Draft Review Context",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/voice/drafts/{{draftId}}/review-context"
+          }
+        },
+        {
+          "name": "Update Draft",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"template_id\": \"{{templateId}}\",\n  \"notes\": \"Reviewed in Postman\",\n  \"items\": []\n}"
+            },
+            "url": "{{baseUrl}}/voice/drafts/{{draftId}}"
+          }
+        },
+        {
+          "name": "Confirm Draft to Invoice",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/voice/drafts/{{draftId}}/confirm"
+          }
+        },
+        {
+          "name": "Cancel Draft",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/voice/drafts/{{draftId}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company Settings",
+      "item": [
+        {
+          "name": "Get Company Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/companies/settings"
+          }
+        },
+        {
+          "name": "Update Company Settings",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_name\": \"Demo Store Updated\",\n  \"owner_name\": \"Demo Owner\",\n  \"mobile\": \"9876543210\",\n  \"gst_number\": \"29ABCDE1234F1Z5\",\n  \"address\": \"Bengaluru, Karnataka\"\n}"
+            },
+            "url": "{{baseUrl}}/companies/settings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/me/profile"
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Platform Admin\",\n  \"settings\": {\n    \"first_name\": \"Platform\",\n    \"last_name\": \"Admin\",\n    \"display_name\": \"Platform Admin\",\n    \"mobile\": \"9876543210\",\n    \"gender\": \"Male\",\n    \"bio\": \"\",\n    \"department\": \"Central Administration\",\n    \"username\": \"admin\",\n    \"appearance_theme\": \"light\",\n    \"two_factor_enabled\": false\n  }\n}"
+            },
+            "url": "{{baseUrl}}/users/me/profile"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"Admin@12345\",\n  \"new_password\": \"Admin@12345New\"\n}"
+            },
+            "url": "{{baseUrl}}/users/me/change-password",
+            "description": "Bumps token_version — re-login after success. Use carefully on shared seed accounts."
+          }
+        }
+      ]
+    },
+    {
+      "name": "GST",
+      "item": [
+        {
+          "name": "Lookup GSTIN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/gst/lookup/{{gstin}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Platform Admin",
+      "description": "Requires platform admin role (seed: admin@blulabs.in).",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/dashboard"
+          }
+        },
+        {
+          "name": "List Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const arr = pm.response.json();",
+                  "  if (Array.isArray(arr) && arr.length) pm.collectionVariables.set('userId', arr[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?search=&is_active=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                { "key": "role", "value": "", "disabled": true },
+                { "key": "search", "value": "" },
+                { "key": "company_id", "value": "", "disabled": true },
+                { "key": "is_active", "value": "true" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": true\n}"
+            },
+            "url": "{{baseUrl}}/admin/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Force Logout User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/admin/users/{{userId}}/force-logout"
+          }
+        },
+        {
+          "name": "Disable User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/admin/users/{{userId}}/disable",
+            "description": "Disables user and force-logout. Use carefully."
+          }
+        },
+        {
+          "name": "List Bills",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/bills?search=",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "bills"],
+              "query": [
+                { "key": "role", "value": "", "disabled": true },
+                { "key": "user_id", "value": "", "disabled": true },
+                { "key": "search", "value": "" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

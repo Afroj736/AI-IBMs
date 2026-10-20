@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Env / secrets — never commit
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Next.js / build
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Local DB / caches
+*.db
+local_smoke.db
+
+# Uploads
+uploads/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Archives (source folders already in repo)
+*.zip
+
+# Logs / coverage
+*.log
+coverage/
+htmlcov/
+.coverage

@@ -1,0 +1,4 @@
+-- Roles are enum-based in schema.
+-- Optional initial admin bootstrap example:
+-- INSERT INTO users (name, email, hashed_password, role)
+-- VALUES ('Super Admin', 'admin@example.com', '<bcrypt-hash>', 'admin');
